@@ -43,11 +43,54 @@ async def list_history(
     return [dict(r) for r in rows]
 
 
+@router.get("/template")
+async def download_history_template():
+    content = generate_history_template()
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=history_template.xlsx"}
+    )
+
+
 @router.post("/import")
 async def import_history(file: UploadFile = File(...)):
     content = await file.read()
     rows, errors = parse_history_excel(content)
     return {"preview": rows, "errors": errors, "total": len(rows)}
+
+
+@router.post("/import/confirm")
+async def confirm_history_import(rows: list[dict]):
+    """確認匯入歷史派單資料"""
+    pool = await get_pool()
+    inserted, errors = 0, []
+    async with pool.acquire() as conn:
+        for row in rows:
+            try:
+                order_row = await conn.fetchrow(
+                    """INSERT INTO orders (order_no,customer_name,address,region,scheduled_time,
+                                          weight,priority,status,data_source)
+                       VALUES ($1,$2,$3,$4,$5,$6,$7,'dispatched','import')
+                       ON CONFLICT (order_no) DO NOTHING RETURNING id""",
+                    row.get("order_no"), row.get("customer_name"), row.get("address"),
+                    row.get("region"), row.get("scheduled_time"), row.get("weight"), row.get("priority", 3)
+                )
+                if not order_row:
+                    continue
+                driver_row = await conn.fetchrow("SELECT id FROM drivers WHERE name=$1", row.get("driver_name"))
+                vehicle_row = await conn.fetchrow("SELECT id FROM vehicles WHERE plate_no=$1", row.get("plate_no"))
+                await conn.execute(
+                    """INSERT INTO dispatches (order_id,driver_id,vehicle_id,assigned_by)
+                       VALUES ($1,$2,$3,'human')""",
+                    order_row["id"],
+                    driver_row["id"] if driver_row else None,
+                    vehicle_row["id"] if vehicle_row else None,
+                )
+                inserted += 1
+            except Exception as e:
+                errors.append({"order_no": row.get("order_no"), "error": str(e)})
+    return {"inserted": inserted, "errors": errors}
 
 
 @router.post("")

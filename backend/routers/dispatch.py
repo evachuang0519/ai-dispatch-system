@@ -10,6 +10,42 @@ from io import BytesIO
 router = APIRouter(prefix="/api/dispatch", tags=["dispatch"])
 
 
+@router.get("/pending")
+async def list_pending_dispatches():
+    """供 dispatch_review.asp 使用：取得待審核的 AI 派單清單"""
+    pool = await get_pool()
+    rows = await pool.fetch(
+        """SELECT d.id AS dispatch_id, d.driver_id, d.vehicle_id, d.confidence, d.ai_reason,
+                  o.id AS order_id, o.order_no, o.customer_name, o.region, o.scheduled_time, o.priority,
+                  dr.name AS driver_name, v.plate_no
+           FROM dispatches d
+           JOIN orders o ON d.order_id = o.id
+           JOIN drivers dr ON d.driver_id = dr.id
+           LEFT JOIN vehicles v ON d.vehicle_id = v.id
+           WHERE d.assigned_by = 'ai' AND o.status = 'pending'
+           ORDER BY o.priority, o.scheduled_time"""
+    )
+    return [dict(r) for r in rows]
+
+
+@router.get("/{dispatch_id}")
+async def get_dispatch(dispatch_id: int):
+    """供 dispatch_edit.asp 使用：取得單筆派單資料"""
+    pool = await get_pool()
+    row = await pool.fetchrow(
+        """SELECT d.*, o.order_no, dr.name AS driver_name, v.plate_no
+           FROM dispatches d
+           JOIN orders o ON d.order_id = o.id
+           JOIN drivers dr ON d.driver_id = dr.id
+           LEFT JOIN vehicles v ON d.vehicle_id = v.id
+           WHERE d.id = $1""",
+        dispatch_id
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="派單記錄不存在")
+    return dict(row)
+
+
 @router.post("")
 async def ai_dispatch():
     pool = await get_pool()

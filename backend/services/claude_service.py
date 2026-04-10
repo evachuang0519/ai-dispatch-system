@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from typing import List, Dict, Any
 import anthropic
 
@@ -72,12 +73,20 @@ async def run_dispatch(orders: List[Dict], drivers: List[Dict], vehicles: List[D
         batch = orders[i:i + BATCH_SIZE]
         prompt = build_prompt(batch, drivers, vehicles, learning_ctx)
 
-        message = client.messages.create(
-            model=MODEL,
-            max_tokens=MAX_TOKENS,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": prompt}]
-        )
+        for attempt in range(3):
+            try:
+                message = client.messages.create(
+                    model=MODEL,
+                    max_tokens=MAX_TOKENS,
+                    system=SYSTEM_PROMPT,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                break
+            except anthropic.APIStatusError as e:
+                if e.status_code == 500 and attempt < 2:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise
 
         raw = message.content[0].text.strip()
         # 移除可能的 markdown code block
