@@ -127,7 +127,7 @@ async def adjust_dispatch(data: AdjustmentCreate):
     return {"ok": True}
 
 
-@router.post("/export")
+@router.get("/export")
 async def export_dispatches():
     pool = await get_pool()
     rows = await pool.fetch(

@@ -33,6 +33,18 @@ async def create_vehicle(data: VehicleCreate):
     return dict(row)
 
 
+@router.get("/{vehicle_id}", response_model=dict)
+async def get_vehicle(vehicle_id: int):
+    pool = await get_pool()
+    row = await pool.fetchrow(
+        "SELECT v.*, d.name as driver_name FROM vehicles v LEFT JOIN drivers d ON v.driver_id=d.id WHERE v.id=$1",
+        vehicle_id
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="車輛不存在")
+    return dict(row)
+
+
 @router.put("/{vehicle_id}", response_model=dict)
 async def update_vehicle(vehicle_id: int, data: VehicleUpdate):
     pool = await get_pool()

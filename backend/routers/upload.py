@@ -1,14 +1,28 @@
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import Response
+from typing import Optional
 from services.db_service import get_pool
 from services.excel_parser import parse_orders_excel, generate_order_template
 
-router = APIRouter(prefix="/api/upload", tags=["upload"])
+router = APIRouter(prefix="/api", tags=["upload"])
 
 _pending_preview: list = []
 
 
-@router.post("")
+@router.get("/orders")
+async def list_orders(status: Optional[str] = None):
+    pool = await get_pool()
+    query = "SELECT * FROM orders WHERE 1=1"
+    params = []
+    if status:
+        params.append(status)
+        query += f" AND status = ${len(params)}"
+    query += " ORDER BY priority, scheduled_time"
+    rows = await pool.fetch(query, *params)
+    return [dict(r) for r in rows]
+
+
+@router.post("/upload")
 async def upload_orders(file: UploadFile = File(...)):
     global _pending_preview
     content = await file.read()
@@ -17,7 +31,7 @@ async def upload_orders(file: UploadFile = File(...)):
     return {"preview": rows, "errors": errors, "total": len(rows)}
 
 
-@router.post("/confirm")
+@router.post("/upload/confirm")
 async def confirm_upload(selected_indices: list[int] | None = None):
     pool = await get_pool()
     rows = _pending_preview
@@ -42,7 +56,7 @@ async def confirm_upload(selected_indices: list[int] | None = None):
     return {"inserted": inserted, "errors": errors}
 
 
-@router.get("/template")
+@router.get("/upload/template")
 async def download_template():
     content = generate_order_template()
     return Response(
