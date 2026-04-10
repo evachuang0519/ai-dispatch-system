@@ -39,17 +39,17 @@
 | P0 | ASP `drivers.asp` | ✅ 完成 | 列表、篩選、搜尋、停用 |
 | P0 | ASP `driver_edit.asp` | ✅ 完成 | 新增 / 編輯表單 |
 | P0 | ASP `vehicles.asp` | ✅ 完成 | 列表、篩選、停用 |
-| P0 | ASP `vehicle_edit.asp` | ⏸ **中斷** | 因 API 500 中斷，尚未建立 |
-| P0 | ASP `history_manage.asp` | ⏸ **待開發** | — |
-| P0 | ASP `history_import.asp` | ⏸ **待開發** | — |
-| P0 | ASP `history_edit.asp` | ⏸ **待開發** | — |
-| P1 | ASP `upload.asp` | ⏸ **待開發** | — |
-| P1 | ASP `dispatch.asp` | ⏸ **待開發** | — |
-| P1 | ASP `dispatch_review.asp` | ⏸ **待開發** | — |
-| P1 | ASP `dispatch_edit.asp` | ⏸ **待開發** | — |
-| P2 | ASP `learning_log.asp` | ⏸ **待開發** | — |
-| P2 | ASP `report.asp` | ⏸ **待開發** | — |
-| — | Git 初始化 + 推送 GitHub | ⏸ **待完成** | Repo 已建立，尚未 push |
+| P0 | ASP `vehicle_edit.asp` | ✅ 完成 | — |
+| P0 | ASP `history_manage.asp` | ✅ 完成 | — |
+| P0 | ASP `history_import.asp` | ✅ 完成 | — |
+| P0 | ASP `history_edit.asp` | ✅ 完成 | — |
+| P1 | ASP `upload.asp` | ✅ 完成 | — |
+| P1 | ASP `dispatch.asp` | ✅ 完成 | — |
+| P1 | ASP `dispatch_review.asp` | ✅ 完成 | — |
+| P1 | ASP `dispatch_edit.asp` | ✅ 完成 | — |
+| P2 | ASP `learning_log.asp` | ✅ 完成 | — |
+| P2 | ASP `report.asp` | ✅ 完成 | — |
+| — | Git 初始化 + 推送 GitHub | ✅ 完成 | https://github.com/evachuang0519/ai-dispatch-system |
 
 ---
 
