@@ -1,0 +1,25 @@
+# 環境變數（含 API Key，絕對不可提交）
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# 上傳暫存
+*.xlsx.tmp
+uploads/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+.claude/
