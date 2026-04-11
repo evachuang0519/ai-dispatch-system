@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from services.db_service import get_pool, close_pool
-from routers import drivers, vehicles, history, upload, dispatch, reports
+from routers import drivers, vehicles, history, upload, dispatch, reports, vehicle_types
 
 
 @asynccontextmanager
@@ -39,6 +39,7 @@ app.include_router(history.router)
 app.include_router(upload.router)
 app.include_router(dispatch.router)
 app.include_router(reports.router)
+app.include_router(vehicle_types.router)
 
 
 @app.get("/")

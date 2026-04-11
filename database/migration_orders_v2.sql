@@ -1,0 +1,22 @@
+-- orders 資料表擴充欄位（對應 1121已排班.xlsx 欄位）
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS order_date        DATE,
+  ADD COLUMN IF NOT EXISTS customer_type     VARCHAR(20),
+  ADD COLUMN IF NOT EXISTS id_no             VARCHAR(20),
+  ADD COLUMN IF NOT EXISTS contact_phone     VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS payment_type      SMALLINT,
+  ADD COLUMN IF NOT EXISTS trip_type         VARCHAR(10),
+  ADD COLUMN IF NOT EXISTS pickup_time       TIME,
+  ADD COLUMN IF NOT EXISTS departure         VARCHAR(200),
+  ADD COLUMN IF NOT EXISTS destination       VARCHAR(200),
+  ADD COLUMN IF NOT EXISTS dropoff_time      TIME,
+  ADD COLUMN IF NOT EXISTS mileage           DECIMAL,
+  ADD COLUMN IF NOT EXISTS fare              DECIMAL,
+  ADD COLUMN IF NOT EXISTS companion_fee     DECIMAL,
+  ADD COLUMN IF NOT EXISTS self_pay          DECIMAL,
+  ADD COLUMN IF NOT EXISTS vehicle_accessories VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS subsidy_balance   VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS qualification     VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS note              TEXT,
+  ADD COLUMN IF NOT EXISTS form_filler       VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS grade             VARCHAR(20);

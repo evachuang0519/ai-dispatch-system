@@ -1,5 +1,8 @@
 <!-- #include file="includes/header.asp" -->
-<h1 class="text-xl font-bold mb-4">歷史派單批次匯入</h1>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-bold">歷史派單批次匯入</h1>
+  <a href="history_manage.asp" class="px-4 py-2 rounded border hover:bg-gray-100 text-sm">取消</a>
+</div>
 
 <div class="mb-4">
   <a href="/api/history/template" class="text-blue-600 hover:underline text-sm">⬇ 下載 Excel 範本</a>
@@ -35,7 +38,7 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
   if (!file) { alert('請選擇 Excel 檔案'); return; }
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch('/api/history/import', {method:'POST', body: formData});
+  const res = await fetch(API_BASE + '/api/history/import', {method:'POST', body: formData});
   const json = await res.json();
   previewData = json.preview || [];
 
@@ -63,7 +66,7 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 });
 
 document.getElementById('confirmBtn').addEventListener('click', async () => {
-  const res = await fetch('/api/history/import/confirm', {
+  const res = await fetch(API_BASE + '/api/history/import/confirm', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(previewData)

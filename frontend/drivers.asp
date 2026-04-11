@@ -1,3 +1,4 @@
+<%@ CodePage=65001 %>
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
@@ -78,7 +79,7 @@ if (rows.length === 0) {
 
 async function toggleDriver(id) {
   if (!confirm('確定要切換此司機狀態？')) return;
-  const res = await fetch('/api/drivers/' + id + '/toggle', {method:'PATCH'});
+  const res = await fetch(API_BASE + '/api/drivers/' + id + '/toggle', {method:'PATCH'});
   if (res.ok) location.reload();
   else alert('操作失敗');
 }

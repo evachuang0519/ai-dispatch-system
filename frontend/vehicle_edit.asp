@@ -1,17 +1,18 @@
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
-Dim mode, vehicleId, vehicleJson, driversJson
+Dim mode, vehicleId, vehicleJson, driversJson, vehicleTypesJson
 mode      = Request.QueryString("mode")
 vehicleId = Request.QueryString("id")
 vehicleJson = "null"
-driversJson = GetAPI("/api/drivers?active=true")
+driversJson      = GetAPI("/api/drivers?active=true")
+vehicleTypesJson = GetAPI("/api/vehicle-types")
 
 If mode = "edit" And vehicleId <> "" Then
     vehicleJson = GetAPI("/api/vehicles/" & vehicleId)
 End If
 %>
-<h1 class="text-xl font-bold mb-4"><%=If(mode="new","新增車輛","編輯車輛")%></h1>
+<h1 class="text-xl font-bold mb-4"><%If mode="new" Then%>新增車輛<%Else%>編輯車輛<%End If%></h1>
 
 <form id="vehicleForm" class="max-w-lg bg-white shadow rounded p-6 space-y-4">
   <div>
@@ -22,9 +23,6 @@ End If
     <label class="block text-sm font-medium mb-1">車型</label>
     <select id="vehicle_type" class="w-full border rounded px-3 py-2">
       <option value="">請選擇</option>
-      <option value="小貨車">小貨車</option>
-      <option value="大貨車">大貨車</option>
-      <option value="冷凍車">冷凍車</option>
     </select>
   </div>
   <div>
@@ -52,6 +50,14 @@ const mode = "<%=mode%>";
 const vehicleId = "<%=vehicleId%>";
 const vehicle = <%=vehicleJson%>;
 const drivers = <%=driversJson%> || [];
+const vehicleTypes = <%=vehicleTypesJson%> || [];
+
+// 填入車型下拉
+const typeSel = document.getElementById('vehicle_type');
+vehicleTypes.forEach(t => {
+  const opt = new Option(t.name, t.name);
+  typeSel.appendChild(opt);
+});
 
 // 填入司機下拉
 const driverSel = document.getElementById('driver_id');
@@ -77,7 +83,7 @@ document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
     driver_id:    document.getElementById('driver_id').value || null,
     note:         document.getElementById('note').value,
   };
-  const url    = mode === 'new' ? '/api/vehicles' : '/api/vehicles/' + vehicleId;
+  const url    = mode === 'new' ? API_BASE + '/api/vehicles' : API_BASE + '/api/vehicles/' + vehicleId;
   const method = mode === 'new' ? 'POST' : 'PUT';
   const res = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
   if (res.ok) location.href = 'vehicles.asp';

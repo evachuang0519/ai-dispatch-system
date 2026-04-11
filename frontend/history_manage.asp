@@ -1,3 +1,4 @@
+<%@ CodePage=65001 %>
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
@@ -47,25 +48,33 @@ if (rows.length === 0) {
   let html = `<table class="w-full text-sm border-collapse bg-white shadow rounded overflow-hidden">
     <thead class="bg-blue-50 text-left">
       <tr>
-        <th class="px-3 py-2 border-b">訂單編號</th>
-        <th class="px-3 py-2 border-b">客戶</th>
+        <th class="px-3 py-2 border-b">日期</th>
+        <th class="px-3 py-2 border-b">個案名</th>
+        <th class="px-3 py-2 border-b">性質</th>
+        <th class="px-3 py-2 border-b">客上</th>
         <th class="px-3 py-2 border-b">地區</th>
-        <th class="px-3 py-2 border-b">預定時段</th>
+        <th class="px-3 py-2 border-b">出發地</th>
+        <th class="px-3 py-2 border-b">目的地</th>
         <th class="px-3 py-2 border-b">司機</th>
-        <th class="px-3 py-2 border-b">車牌</th>
-        <th class="px-3 py-2 border-b">派單方式</th>
+        <th class="px-3 py-2 border-b">車號</th>
+        <th class="px-3 py-2 border-b">車資</th>
         <th class="px-3 py-2 border-b">操作</th>
       </tr>
     </thead><tbody>`;
   rows.forEach(r => {
+    const d = r.order_date ? r.order_date.slice(0,10) : (r.scheduled_time ? r.scheduled_time.slice(0,10) : '');
+    const t = r.pickup_time ? r.pickup_time.slice(0,5) : '';
     html += `<tr class="hover:bg-gray-50">
-      <td class="px-3 py-2 border-b">${r.order_no||''}</td>
+      <td class="px-3 py-2 border-b">${d}</td>
       <td class="px-3 py-2 border-b">${r.customer_name||''}</td>
+      <td class="px-3 py-2 border-b">${r.trip_type||''}</td>
+      <td class="px-3 py-2 border-b">${t}</td>
       <td class="px-3 py-2 border-b">${r.region||''}</td>
-      <td class="px-3 py-2 border-b">${r.scheduled_time ? r.scheduled_time.replace('T',' ').slice(0,16) : ''}</td>
+      <td class="px-3 py-2 border-b">${r.departure||r.address||''}</td>
+      <td class="px-3 py-2 border-b">${r.destination||''}</td>
       <td class="px-3 py-2 border-b">${r.driver_name||''}</td>
       <td class="px-3 py-2 border-b">${r.plate_no||''}</td>
-      <td class="px-3 py-2 border-b">${r.assigned_by||''}</td>
+      <td class="px-3 py-2 border-b">${r.fare!=null ? r.fare : ''}</td>
       <td class="px-3 py-2 border-b flex gap-2">
         <a href="history_edit.asp?mode=edit&id=${r.id}" class="text-blue-600 hover:underline">編輯</a>
         <button onclick="deleteHistory(${r.id})" class="text-red-500 hover:underline">刪除</button>
@@ -78,7 +87,7 @@ if (rows.length === 0) {
 
 async function deleteHistory(id) {
   if (!confirm('確定要刪除此筆記錄？此操作無法還原。')) return;
-  const res = await fetch('/api/history/' + id, {method:'DELETE'});
+  const res = await fetch(API_BASE + '/api/history/' + id, {method:'DELETE'});
   if (res.ok) location.reload();
   else alert('刪除失敗');
 }

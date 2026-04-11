@@ -40,7 +40,7 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch('/api/upload', {method:'POST', body: formData});
+  const res = await fetch(API_BASE + '/api/upload', {method:'POST', body: formData});
   const json = await res.json();
 
   btn.textContent = '上傳並預覽';
@@ -57,8 +57,8 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
   }
 
   if (preview.length > 0) {
-    const keys   = ['order_no','customer_name','region','scheduled_time','weight','priority'];
-    const labels = ['訂單編號','客戶名稱','地區','預定時段','重量(kg)','優先級'];
+    const keys   = ['order_date','customer_name','trip_type','pickup_time','region','departure','destination','driver_name','plate_no'];
+    const labels = ['日期','個案名','性質','客上','地區','出發地','目的地','司機','車號'];
     let html = '<thead class="bg-blue-50"><tr>' +
       labels.map(l=>`<th class="px-3 py-2 border-b text-left">${l}</th>`).join('') +
       '</tr></thead><tbody>';
@@ -75,7 +75,7 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
   btn.textContent = '匯入中...';
   btn.disabled = true;
 
-  const res = await fetch('/api/upload/confirm', {method:'POST', headers:{'Content-Type':'application/json'}, body:'null'});
+  const res = await fetch(API_BASE + '/api/upload/confirm', {method:'POST', headers:{'Content-Type':'application/json'}, body:'null'});
   const json = await res.json();
 
   const resultDiv = document.getElementById('resultSection');

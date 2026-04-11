@@ -63,7 +63,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
     adjust_note:         document.getElementById('adjust_note').value,
     adjusted_by:         'operator',
   };
-  const res = await fetch('/api/dispatch/adjust', {
+  const res = await fetch(API_BASE + '/api/dispatch/adjust', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(body)

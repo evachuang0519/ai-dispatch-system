@@ -1,3 +1,4 @@
+<%@ CodePage=65001 %>
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
@@ -72,7 +73,7 @@ if (rows.length === 0) {
 
 async function toggleVehicle(id) {
   if (!confirm('確定要切換此車輛狀態？')) return;
-  const res = await fetch('/api/vehicles/' + id + '/toggle', {method:'PATCH'});
+  const res = await fetch(API_BASE + '/api/vehicles/' + id + '/toggle', {method:'PATCH'});
   if (res.ok) location.reload();
   else alert('操作失敗');
 }

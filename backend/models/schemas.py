@@ -105,6 +105,21 @@ class AdjustmentCreate(BaseModel):
     adjusted_by: str
 
 
+# ── VehicleType ──────────────────────────────────────────
+class VehicleTypeCreate(BaseModel):
+    name: str
+    sort_order: int = 0
+
+class VehicleTypeItem(BaseModel):
+    id: int
+    name: str
+    sort_order: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # ── Learning / Report ────────────────────────────────────
 class LearningStats(BaseModel):
     batch_date: Optional[datetime] = None

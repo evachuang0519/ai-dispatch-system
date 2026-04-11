@@ -100,7 +100,7 @@ function toggleEdit(id) {
 }
 
 async function confirmOne(dispatchId) {
-  const res = await fetch('/api/dispatch/confirm/' + dispatchId, {method:'POST'});
+  const res = await fetch(API_BASE + '/api/dispatch/confirm/' + dispatchId, {method:'POST'});
   if (res.ok) {
     document.getElementById('card-' + dispatchId).remove();
   } else alert('操作失敗');
@@ -115,7 +115,7 @@ async function submitAdjust(dispatchId) {
     adjust_note:        document.getElementById('adj-note-'   + dispatchId).value,
     adjusted_by:        'operator',
   };
-  const res = await fetch('/api/dispatch/adjust', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  const res = await fetch(API_BASE + '/api/dispatch/adjust', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
   if (res.ok) {
     document.getElementById('card-' + dispatchId).remove();
   } else alert('儲存失敗');
@@ -124,7 +124,7 @@ async function submitAdjust(dispatchId) {
 document.getElementById('confirmAllBtn').addEventListener('click', async () => {
   if (!confirm('確定要確認所有待審核派單？')) return;
   for (const d of dispatches) {
-    await fetch('/api/dispatch/confirm/' + d.dispatch_id, {method:'POST'});
+    await fetch(API_BASE + '/api/dispatch/confirm/' + d.dispatch_id, {method:'POST'});
   }
   location.reload();
 });

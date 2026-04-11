@@ -1,3 +1,4 @@
+<%@ CodePage=65001 %>
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
@@ -31,7 +32,7 @@ End If
     <table id="suggestionTable" class="w-full text-sm border-collapse bg-white shadow rounded overflow-hidden">
       <thead class="bg-blue-50 text-left">
         <tr>
-          <th class="px-3 py-2 border-b">訂單編號</th>
+          <th class="px-3 py-2 border-b">個案名</th>
           <th class="px-3 py-2 border-b">建議司機</th>
           <th class="px-3 py-2 border-b">建議車輛</th>
           <th class="px-3 py-2 border-b">信心分數</th>
@@ -51,25 +52,32 @@ if (pending.length > 0) {
   let html = `<table class="w-full text-sm border-collapse bg-white shadow rounded overflow-hidden">
     <thead class="bg-gray-50 text-left">
       <tr>
-        <th class="px-3 py-2 border-b">訂單編號</th>
-        <th class="px-3 py-2 border-b">客戶</th>
+        <th class="px-3 py-2 border-b">日期</th>
+        <th class="px-3 py-2 border-b">個案名</th>
+        <th class="px-3 py-2 border-b">性質</th>
+        <th class="px-3 py-2 border-b">客上</th>
         <th class="px-3 py-2 border-b">地區</th>
-        <th class="px-3 py-2 border-b">預定時段</th>
-        <th class="px-3 py-2 border-b">優先級</th>
+        <th class="px-3 py-2 border-b">出發地</th>
+        <th class="px-3 py-2 border-b">目的地</th>
       </tr>
     </thead><tbody>`;
   pending.forEach(o => {
-    html += `<tr><td class="px-3 py-2 border-b">${o.order_no||''}</td>
+    const d = o.order_date ? o.order_date.slice(0,10) : '';
+    const t = o.pickup_time ? o.pickup_time.slice(0,5) : '';
+    html += `<tr class="hover:bg-gray-50">
+      <td class="px-3 py-2 border-b">${d}</td>
       <td class="px-3 py-2 border-b">${o.customer_name||''}</td>
+      <td class="px-3 py-2 border-b">${o.trip_type||''}</td>
+      <td class="px-3 py-2 border-b">${t}</td>
       <td class="px-3 py-2 border-b">${o.region||''}</td>
-      <td class="px-3 py-2 border-b">${o.scheduled_time?.slice(0,16)||''}</td>
-      <td class="px-3 py-2 border-b">${o.priority||3}</td></tr>`;
+      <td class="px-3 py-2 border-b">${o.departure||''}</td>
+      <td class="px-3 py-2 border-b">${o.destination||''}</td>
+    </tr>`;
   });
   html += '</tbody></table>';
   pendingDiv.innerHTML = html;
 }
 
-// 信心分數顏色
 function confidenceClass(v) {
   if (v >= 0.8) return 'text-green-600 font-semibold';
   if (v >= 0.5) return 'text-yellow-600 font-semibold';
@@ -83,7 +91,7 @@ document.getElementById('dispatchBtn').addEventListener('click', async () => {
   document.getElementById('loadingMsg').classList.remove('hidden');
 
   try {
-    const res = await fetch('/api/dispatch', {method:'POST'});
+    const res = await fetch(API_BASE + '/api/dispatch', {method:'POST'});
     const json = await res.json();
     document.getElementById('loadingMsg').classList.add('hidden');
 

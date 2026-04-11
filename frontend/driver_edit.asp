@@ -1,16 +1,17 @@
 <!-- #include file="includes/header.asp" -->
 <!-- #include file="includes/db_conn.asp" -->
 <%
-Dim mode, driverId, driverJson
+Dim mode, driverId, driverJson, vehicleTypesJson
 mode     = Request.QueryString("mode")
 driverId = Request.QueryString("id")
 driverJson = "null"
+vehicleTypesJson = GetAPI("/api/vehicle-types")
 
 If mode = "edit" And driverId <> "" Then
     driverJson = GetAPI("/api/drivers/" & driverId)
 End If
 %>
-<h1 class="text-xl font-bold mb-4"><%=If(mode="new","新增司機","編輯司機")%></h1>
+<h1 class="text-xl font-bold mb-4"><%If mode="new" Then%>新增司機<%Else%>編輯司機<%End If%></h1>
 
 <form id="driverForm" class="max-w-lg bg-white shadow rounded p-6 space-y-4">
   <div>
@@ -23,13 +24,7 @@ End If
   </div>
   <div>
     <label class="block text-sm font-medium mb-1">可操作車型</label>
-    <select id="vehicle_type" class="w-full border rounded px-3 py-2">
-      <option value="">請選擇</option>
-      <option value="小貨車">小貨車</option>
-      <option value="大貨車">大貨車</option>
-      <option value="冷凍車">冷凍車</option>
-      <option value="小貨車,大貨車">小貨車,大貨車</option>
-    </select>
+    <div id="vehicleTypeChecks" class="flex flex-wrap gap-3 mt-1"></div>
   </div>
   <div>
     <label class="block text-sm font-medium mb-1">負責地區</label>
@@ -54,25 +49,42 @@ End If
 const mode = "<%=mode%>";
 const driverId = "<%=driverId%>";
 const driver = <%=driverJson%>;
+const vehicleTypes = <%=vehicleTypesJson%> || [];
+
+// 動態產生車型 checkbox
+const checksDiv = document.getElementById('vehicleTypeChecks');
+const selectedTypes = driver ? (driver.vehicle_type || '').split(',').map(s => s.trim()) : [];
+vehicleTypes.forEach(t => {
+  const label = document.createElement('label');
+  label.className = 'flex items-center gap-1 cursor-pointer';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.value = t.name;
+  cb.className = 'vehicle-type-cb';
+  if (selectedTypes.includes(t.name)) cb.checked = true;
+  label.appendChild(cb);
+  label.appendChild(document.createTextNode(t.name));
+  checksDiv.appendChild(label);
+});
 
 if (driver) {
   document.getElementById('name').value = driver.name || '';
   document.getElementById('phone').value = driver.phone || '';
-  document.getElementById('vehicle_type').value = driver.vehicle_type || '';
   document.getElementById('region').value = driver.region || '';
   document.getElementById('note').value = driver.note || '';
 }
 
 document.getElementById('driverForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const checkedTypes = [...document.querySelectorAll('.vehicle-type-cb:checked')].map(cb => cb.value).join(',');
   const body = {
     name: document.getElementById('name').value,
     phone: document.getElementById('phone').value,
-    vehicle_type: document.getElementById('vehicle_type').value,
+    vehicle_type: checkedTypes,
     region: document.getElementById('region').value,
     note: document.getElementById('note').value,
   };
-  const url = mode === 'new' ? '/api/drivers' : '/api/drivers/' + driverId;
+  const url = mode === 'new' ? API_BASE + '/api/drivers' : API_BASE + '/api/drivers/' + driverId;
   const method = mode === 'new' ? 'POST' : 'PUT';
   const res = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
   if (res.ok) {
